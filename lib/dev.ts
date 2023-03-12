@@ -4,6 +4,7 @@ import {
   ReqWithUrl,
   setBucketMiddleWare,
   setBucketUrlOnRequest,
+  setBucketUrlOnRequestWithHydration,
   StorageDriver,
 } from ".";
 
@@ -40,6 +41,26 @@ app.get(
     next();
   },
   setBucketUrlOnRequest(db, true)
+);
+
+// let the middleware find and stream the prod bundle value, hydrate these values onto the page
+app.get(
+  "/hydrate",
+  (req: ReqWithUrl, res: Response, next: NextFunction) => {
+    req.envToServe = "prod";
+    next();
+  },
+  setBucketUrlOnRequestWithHydration(db, { hydrated: "yes" })
+);
+
+// let the middleware find and stream the prod bundle value
+app.get(
+  "/cache",
+  (req: ReqWithUrl, res: Response, next: NextFunction) => {
+    req.envToServe = "prod";
+    next();
+  },
+  setBucketUrlOnRequest(db, false, true)
 );
 
 // start on port 4000
